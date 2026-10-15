@@ -1,19 +1,18 @@
-import { NextResponse, connection } from 'next/server';
+import { NextResponse, connection, type NextRequest } from 'next/server';
 
-export async function GET(request: Request) {
-  // Buộc Next.js chuyển route sang chế độ dynamic, tránh lỗi prerender khi dùng cacheComponents
+export async function GET(request: NextRequest) {
+  // Buộc Next.js bứt ra khỏi quá trình prerender tương thích tuyệt đối với cacheComponents
   await connection();
 
   try {
-    const { searchParams } = new URL(request.url);
-    const query = searchParams.get('q');
-    const page = searchParams.get('page') || '1';
+    const url = new URL(request.url);
+    const query = url.searchParams.get('q');
+    const page = url.searchParams.get('page') || '1';
 
     if (!query) {
       return NextResponse.json({ error: 'Thiếu từ khóa tìm kiếm' }, { status: 400 });
     }
 
-    // Danh sách các máy chủ Invidious công khai ổn định
     const instances = [
       'https://vid.puffyan.us',
       'https://invidious.projectsegfau.lt',
@@ -22,15 +21,20 @@ export async function GET(request: Request) {
 
     let rawData = null;
 
-    // Vòng lặp dự phòng (fallback) qua các instance
     for (const instance of instances) {
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+
         const res = await fetch(`${instance}/api/v1/search?q=${encodeURIComponent(query)}&page=${page}`, {
           headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
           },
-          cache: 'no-store'
+          cache: 'no-store',
+          signal: controller.signal
         });
+
+        clearTimeout(timeoutId);
 
         if (res.ok) {
           rawData = await res.json();
@@ -42,7 +46,7 @@ export async function GET(request: Request) {
     }
 
     if (!rawData || !Array.isArray(rawData)) {
-      return NextResponse.json({ videos: [], error: 'Không thể kết nối đến máy chủ tìm kiếm.' }, { status: 500 });
+      return NextResponse.json({ videos: [] });
     }
 
     const videos = rawData
@@ -59,7 +63,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ videos });
   } catch (error: any) {
     console.error('API Search Error:', error);
-    return NextResponse.json({ videos: [], error: error.message || 'Lỗi hệ thống' }, { status: 500 });
+    return NextResponse.json({ videos: [] }, { status: 500 });
   }
 }
 
