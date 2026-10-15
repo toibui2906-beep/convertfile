@@ -1,7 +1,6 @@
 import { NextResponse, connection, type NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
-  // Buộc Next.js bứt ra khỏi quá trình prerender tương thích tuyệt đối với cacheComponents
   await connection();
 
   try {
@@ -10,7 +9,7 @@ export async function GET(request: NextRequest) {
     const page = url.searchParams.get('page') || '1';
 
     if (!query) {
-      return NextResponse.json({ error: 'Thiếu từ khóa tìm kiếm' }, { status: 400 });
+      return NextResponse.json({ videos: [] }, { status: 400 });
     }
 
     const instances = [
@@ -19,7 +18,7 @@ export async function GET(request: NextRequest) {
       'https://inv.nadeko.net'
     ];
 
-    let rawData = null;
+    let rawData: any = null;
 
     for (const instance of instances) {
       try {
@@ -37,8 +36,15 @@ export async function GET(request: NextRequest) {
         clearTimeout(timeoutId);
 
         if (res.ok) {
-          rawData = await res.json();
-          break;
+          const json = await res.json();
+          // Kiểm tra xem dữ liệu trả về là mảng trực tiếp hay nằm trong thuộc tính
+          if (Array.isArray(json)) {
+            rawData = json;
+            break;
+          } else if (json && Array.isArray(json.videos)) {
+            rawData = json.videos;
+            break;
+          }
         }
       } catch (err) {
         continue;
@@ -50,7 +56,7 @@ export async function GET(request: NextRequest) {
     }
 
     const videos = rawData
-      .filter((item: any) => item.type === 'video')
+      .filter((item: any) => !item.type || item.type === 'video')
       .map((v: any) => ({
         title: v.title || 'Không có tiêu đề',
         videoId: v.videoId || '',
