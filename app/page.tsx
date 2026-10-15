@@ -1,235 +1,192 @@
 "use client";
 
-import React, { useState } from "react";
-import {
-  FileSpreadsheet,
-  UploadCloud,
-  CheckCircle2,
-  AlertCircle,
-  Download,
-  Loader2,
-  Cpu,
-  Layers,
-  FileCheck,
-  ShieldCheck,
-  ArrowRight,
+import Link from "next/link";
+import { 
+  Award, 
+  Calendar, 
+  ArrowRight, 
+  Activity, 
+  Building2, 
+  Sparkles, 
+  CheckCircle2, 
+  Clock, 
+  ShieldCheck 
 } from "lucide-react";
 
-export default function RosterConverterPage() {
-  const [file, setFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-      setError(null);
-      setSuccess(false);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFile(e.dataTransfer.files[0]);
-      setError(null);
-      setSuccess(false);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (!file) {
-      setError("Vui lòng chọn file Excel Roster đầu vào.");
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    setSuccess(false);
-
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const response = await fetch("/api/convert", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const resData = await response.json();
-        throw new Error(resData.error || "Xử lý thất bại.");
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `Roster_Converted_${new Date().toISOString().slice(0, 10)}.xlsx`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-
-      setSuccess(true);
-    } catch (err: any) {
-      setError(err.message || "Có lỗi xảy ra khi chuyển đổi file.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+export default function Home() {
   return (
-    <div className="min-h-screen bg-[#1143d6] text-slate-900 font-sans relative overflow-hidden pb-16">
-      {/* Background Decorative Wave/Curve Effect mô phỏng template */}
-      <div className="absolute top-0 left-0 right-0 h-96 bg-gradient-to-b from-[#0b2bb8] to-[#1143d6] -z-10" />
-      <div className="absolute top-80 left-0 right-0 h-48 bg-white/5 rounded-t-[100%] pointer-events-none -z-10" />
-
-      <div className="max-w-4xl mx-auto px-6 pt-12 space-y-8">
+    <main className="min-h-screen bg-slate-50/80 text-slate-900 pb-16">
+      
+      {/* HERO HEADER */}
+      <header className="bg-gradient-to-r from-emerald-800 via-teal-800 to-slate-900 text-white pt-12 pb-24 px-6 shadow-md relative overflow-hidden">
+        <div className="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">
+          <Activity className="w-96 h-96 text-white" />
+        </div>
         
-        {/* Header Section */}
-        <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-2 bg-[#ffb703] text-blue-950 px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider shadow-md">
-            <Cpu className="w-4 h-4" /> Enterprise Roster Automation System
-          </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight drop-shadow-sm">
-            Giải pháp Chuyển đổi Lịch trực Tối ưu
-          </h1>
-          <p className="text-blue-100 text-sm md:text-base max-w-xl mx-auto font-medium">
-            Tự động hóa bóc tách và quy đổi dữ liệu ca trực điều dưỡng chuẩn xác từ ma trận sang hệ thống.
-          </p>
-        </div>
-
-        {/* Feature Cards Grid (Phong cách tech illustration components) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 text-white shadow-xl hover:bg-white/15 transition-all">
-            <div className="w-10 h-10 rounded-xl bg-[#ffb703] text-blue-950 flex items-center justify-center font-bold mb-3 shadow-md">
-              <FileSpreadsheet className="w-5 h-5" />
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
+          <div className="space-y-4 max-w-3xl">
+            <div className="inline-flex items-center space-x-2 bg-emerald-500/20 border border-emerald-400/30 backdrop-blur-md px-3.5 py-1.5 rounded-full text-emerald-200 text-xs font-semibold tracking-wide uppercase">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
+              <span>Nền tảng quản lý vận hành y tế</span>
             </div>
-            <h3 className="font-bold text-sm mb-1">Sheet Roster</h3>
-            <p className="text-xs text-blue-100 leading-relaxed">
-              Quét tự động dải ngày từ 26 tháng này đến 25 tháng sau theo mốc ô L1.
+            
+            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
+              Cổng công cụ quản lý <span className="text-emerald-400">Khoa Cấp cứu</span>
+            </h1>
+            
+            <p className="text-slate-300 text-sm md:text-base leading-relaxed">
+              Tối ưu hóa quy trình đánh giá năng lực cán bộ và tự động hóa công tác lập lịch trực y tế, nâng cao hiệu quả vận hành chuyên môn tại khoa.
             </p>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 text-white shadow-xl hover:bg-white/15 transition-all">
-            <div className="w-10 h-10 rounded-xl bg-[#ffb703] text-blue-950 flex items-center justify-center font-bold mb-3 shadow-md">
-              <Layers className="w-5 h-5" />
+          <div className="flex items-center space-x-3 bg-white/10 backdrop-blur-md border border-white/10 p-4 rounded-2xl shrink-0">
+            <Building2 className="w-10 h-10 text-emerald-400" />
+            <div>
+              <p className="text-xs text-slate-300 font-medium">Đơn vị sử dụng</p>
+              <p className="text-sm font-bold text-white">Khoa Cấp cứu - Bệnh viện ĐKQT Vinmec Times City</p>
             </div>
-            <h3 className="font-bold text-sm mb-1">Template Gốc</h3>
-            <p className="text-xs text-blue-100 leading-relaxed">
-              Chuẩn hóa mã ca quy đổi, tách mã và tên phòng riêng biệt, đánh số thứ tự.
-            </p>
-          </div>
-
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 text-white shadow-xl hover:bg-white/15 transition-all">
-            <div className="w-10 h-10 rounded-xl bg-[#ffb703] text-blue-950 flex items-center justify-center font-bold mb-3 shadow-md">
-              <FileCheck className="w-5 h-5" />
-            </div>
-            <h3 className="font-bold text-sm mb-1">Import_PhanCa</h3>
-            <p className="text-xs text-blue-100 leading-relaxed">
-              Loại bỏ dòng trống và tự động lọc bỏ các nhân sự thiếu Tài khoản AD.
-            </p>
           </div>
         </div>
+      </header>
 
-        {/* Main Upload Card */}
-        <div className="bg-white rounded-3xl p-6 md:p-8 shadow-2xl space-y-6 border border-slate-100">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shadow-inner">
-                <UploadCloud className="w-5 h-5" />
+      {/* MAIN CONTENT CONTAINERS */}
+      <div className="max-w-7xl mx-auto px-6 -mt-12 space-y-8 relative z-20">
+
+        {/* CARDS LỐI VÀO PHÂN HỆ */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          {/* Card 1: Đánh giá 360 */}
+          <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200/80 p-8 flex flex-col justify-between hover:border-emerald-500/50 transition-all duration-200 group">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="p-3.5 bg-emerald-50 text-emerald-600 rounded-2xl group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-200">
+                  <Award className="w-8 h-8" />
+                </div>
+                <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                  Đánh giá năng lực
+                </span>
+              </div>
+
+              <h2 className="text-2xl font-bold text-slate-800">
+                Đánh giá 360° cán bộ y tế
+              </h2>
+              
+              <p className="text-slate-600 text-sm leading-relaxed">
+                Phân tích dữ liệu khảo sát tín nhiệm đa chiều, tự động tổng hợp điểm KPI và xếp loại khen thưởng cán bộ y tế, điều dưỡng trong khoa.
+              </p>
+
+              <ul className="space-y-2 pt-2 text-xs text-slate-500">
+                <li className="flex items-center space-x-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Xử lý file khảo sát định dạng Excel (.xlsx, .csv)</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Tạo bằng khen cho nhân viên xuất sắc tiện lợi</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Xuất báo cáo định dạng Times New Roman chuẩn y khoa</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="pt-8">
+              <Link
+                href="/360"
+                className="inline-flex items-center justify-center w-full space-x-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold py-3 px-6 rounded-xl text-sm shadow-sm transition"
+              >
+                <span>Truy cập phân hệ 360°</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Card 2: Chuyển đổi lịch trực */}
+          <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200/80 p-8 flex flex-col justify-between hover:border-emerald-500/50 transition-all duration-200 group">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="p-3.5 bg-teal-50 text-teal-600 rounded-2xl group-hover:bg-teal-600 group-hover:text-white transition-colors duration-200">
+                  <Calendar className="w-8 h-8" />
+                </div>
+                <span className="text-xs font-semibold text-teal-700 bg-teal-50 px-3 py-1 rounded-full border border-teal-200">
+                  Quản lý lịch trực
+                </span>
+              </div>
+
+              <h2 className="text-2xl font-bold text-slate-800">
+                Chuyển đổi lịch trực điều dưỡng
+              </h2>
+              
+              <p className="text-slate-600 text-sm leading-relaxed">
+                Tự động bóc tách dữ liệu từ ma trận lịch trực, quy đổi mã ca trực và tách danh sách nhân sự sẵn sàng đưa vào hệ thống quản lý.
+              </p>
+
+              <ul className="space-y-2 pt-2 text-xs text-slate-500">
+                <li className="flex items-center space-x-2">
+                  <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
+                  <span>Tự động nhận diện dải ngày lịch trực từ ngày 26 đến 25</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
+                  <span>Quy đổi chuẩn xác mã ca và tách tên phòng chuyên môn</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
+                  <span>Tự động lọc bỏ các dòng dữ liệu thiếu tài khoản AD</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="pt-8">
+              <Link
+                href="/calendars"
+                className="inline-flex items-center justify-center w-full space-x-2 bg-slate-800 hover:bg-slate-900 active:bg-slate-950 text-white font-semibold py-3 px-6 rounded-xl text-sm shadow-sm transition"
+              >
+                <span>Truy cập phân hệ lịch trực</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+
+        </div>
+
+        {/* THÔNG TIN TỔNG QUAN HỆ THỐNG */}
+        <section className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 md:p-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-slate-100 text-slate-700 rounded-xl">
+                <ShieldCheck className="w-6 h-6" />
               </div>
               <div>
-                <h2 className="font-bold text-slate-800 text-base">Tải lên file Roster Excel</h2>
-                <p className="text-xs text-slate-400">Định dạng hỗ trợ: .xlsx, .xls</p>
+                <h3 className="font-bold text-slate-800 text-sm">Bảo mật dữ liệu</h3>
+                <p className="text-xs text-slate-500 mt-0.5">Xử lý dữ liệu trực tiếp trên thiết bị, bảo mật thông tin nhân sự.</p>
               </div>
             </div>
-            <span className="inline-flex items-center gap-1.5 text-xs bg-emerald-50 text-emerald-700 font-bold px-3 py-1 rounded-full border border-emerald-200">
-              <ShieldCheck className="w-3.5 h-3.5" /> Sẵn sàng hoạt động
-            </span>
-          </div>
 
-          {/* Upload Dropzone */}
-          <div
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={handleDrop}
-            className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all cursor-pointer ${
-              file
-                ? "border-blue-600 bg-blue-50/40"
-                : "border-slate-200 hover:border-blue-400 bg-slate-50/60"
-            }`}
-          >
-            <input
-              type="file"
-              accept=".xlsx, .xls"
-              onChange={handleFileChange}
-              className="hidden"
-              id="roster-upload"
-            />
-            <label htmlFor="roster-upload" className="cursor-pointer space-y-3 block">
-              <div className="mx-auto w-14 h-14 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center shadow-inner">
-                <UploadCloud className="w-7 h-7" />
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-slate-100 text-slate-700 rounded-xl">
+                <Clock className="w-6 h-6" />
               </div>
-              {file ? (
-                <div>
-                  <p className="font-bold text-slate-800 text-sm">{file.name}</p>
-                  <p className="text-xs text-slate-500 mt-1">
-                    {(file.size / 1024).toFixed(1)} KB — Nhấp để chọn file khác
-                  </p>
-                </div>
-              ) : (
-                <div>
-                  <p className="font-semibold text-slate-700 text-sm">
-                    Kéo thả file vào đây hoặc <span className="text-blue-600 underline font-bold">chọn từ thiết bị</span>
-                  </p>
-                  <p className="text-xs text-slate-400 mt-1">Hệ thống xử lý trực tiếp các sheet Roster, Account và Nurses</p>
-                </div>
-              )}
-            </label>
-          </div>
-
-          {/* Feedback Messages */}
-          {error && (
-            <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 text-sm p-3.5 rounded-xl">
-              <AlertCircle className="w-5 h-5 shrink-0" />
-              <span>{error}</span>
+              <div>
+                <h3 className="font-bold text-slate-800 text-sm">Tiết kiệm thời gian</h3>
+                <p className="text-xs text-slate-500 mt-0.5">Rút ngắn thời gian lập báo cáo và quy đổi lịch trực chỉ còn vài giây.</p>
+              </div>
             </div>
-          )}
 
-          {success && (
-            <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm p-3.5 rounded-xl">
-              <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-600" />
-              <span>Chuyển đổi thành công! File Excel kết quả đã được tải xuống máy của bạn.</span>
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-slate-100 text-slate-700 rounded-xl">
+                <Activity className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-800 text-sm">Chuẩn hóa y tế</h3>
+                <p className="text-xs text-slate-500 mt-0.5">Định dạng nhất quán, đúng tiêu chuẩn quản lý lâm sàng.</p>
+              </div>
             </div>
-          )}
-
-          {/* Action Button */}
-          <div className="flex justify-end pt-2">
-            <button
-              onClick={handleSubmit}
-              disabled={loading || !file}
-              className={`flex items-center gap-3 px-8 py-3.5 rounded-xl text-sm font-bold text-white transition-all shadow-lg ${
-                loading || !file
-                  ? "bg-slate-300 cursor-not-allowed shadow-none"
-                  : "bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 active:scale-95 shadow-blue-600/30"
-              }`}
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" /> Đang chạy thuật toán xử lý...
-                </>
-              ) : (
-                <>
-                  <Download className="w-5 h-5" /> Thực hiện Chuyển đổi & Tải file <ArrowRight className="w-4 h-4 ml-1" />
-                </>
-              )}
-            </button>
           </div>
-        </div>
+        </section>
 
       </div>
-    </div>
+    </main>
   );
 }
