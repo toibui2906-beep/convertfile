@@ -180,7 +180,13 @@ export default function Home() {
               </div>
               <div>
                 <h3 className="font-bold text-slate-800 text-sm">Chuẩn hóa y tế</h3>
-                <p className="text-xs text-slate-500 mt-0.5">Định dạng nhất quán, đúng tiêu chuẩn quản lý lâm sàng.</p>
+                <Link
+                href="/youtube"
+                className="inline-flex items-center justify-center w-full space-x-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold py-3 px-6 rounded-xl text-sm shadow-sm transition"
+              >
+                <span>Trình chiếu youtube không quảng cáo</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
               </div>
             </div>
           </div>
