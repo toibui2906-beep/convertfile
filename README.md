@@ -16,6 +16,12 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## YouTube Search
+
+Set `YOUTUBE_API_KEY` in the local environment and in Vercel Project Settings to use the official YouTube Data API for search. Create the key in Google Cloud, enable YouTube Data API v3, and restrict the key to that API. Keep it server-side; do not prefix it with `NEXT_PUBLIC_`.
+
+Without this key, search falls back to `yt-search`, which may be blocked when the app runs from a Vercel server IP.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

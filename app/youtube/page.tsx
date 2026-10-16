@@ -26,9 +26,11 @@ export default function Home() {
   const [videos, setVideos] = useState<VideoItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
   const [currentQuery, setCurrentQuery] = useState<string>('trending music 2026');
   const [page, setPage] = useState<number>(1);
+  const [nextPageToken, setNextPageToken] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState<boolean>(true);
 
   const [playlist, setPlaylist] = useState<VideoItem[]>([]);
@@ -103,25 +105,29 @@ export default function Home() {
     }
   }, [currentIndex, playlist, apiLoaded]);
 
-  const fetchVideos = async (query: string, pageNum: number, isAppend: boolean) => {
-    if (pageNum === 1) setLoading(true);
+  const fetchVideos = async (query: string, pageNum: number, isAppend: boolean, pageToken?: string | null) => {
+    if (pageNum === 1) {
+      setLoading(true);
+      setSearchError(null);
+      setVideos([]);
+    }
     else setLoadingMore(true);
 
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}&page=${pageNum}`);
+      const params = new URLSearchParams({ q: query, page: String(pageNum) });
+      if (pageToken) params.set('pageToken', pageToken);
+      const res = await fetch(`/api/search?${params}`);
       const data = await res.json();
-      if (data.videos) {
-        if (isAppend) {
-          setVideos((prev) => [...prev, ...data.videos]);
-        } else {
-          setVideos(data.videos);
-        }
-        if (data.videos.length === 0) {
-          setHasMore(false);
-        }
+      if (!res.ok) {
+        throw new Error(data.error || 'Không thể tìm kiếm video lúc này.');
       }
-    } catch (err) {
-      console.error(err);
+      const foundVideos: VideoItem[] = data.videos || [];
+      setVideos((previous) => isAppend ? [...previous, ...foundVideos] : foundVideos);
+      setNextPageToken(data.nextPageToken || null);
+      setHasMore(Boolean(data.hasMore));
+    } catch (error) {
+      console.error(error);
+      setSearchError(error instanceof Error ? error.message : 'Không thể tìm kiếm video lúc này.');
     }
 
     setLoading(false);
@@ -131,7 +137,7 @@ export default function Home() {
   const handleLoadMore = () => {
     const nextPage = page + 1;
     setPage(nextPage);
-    fetchVideos(currentQuery, nextPage, true);
+    fetchVideos(currentQuery, nextPage, true, nextPageToken);
   };
 
   const extractVideoId = (url: string): string | null => {
@@ -206,6 +212,7 @@ export default function Home() {
     if (!query) {
       setCurrentQuery('trending music 2026');
       setPage(1);
+      setNextPageToken(null);
       setHasMore(true);
       fetchVideos('trending music 2026', 1, false);
       return;
@@ -226,6 +233,7 @@ export default function Home() {
 
     setCurrentQuery(query);
     setPage(1);
+    setNextPageToken(null);
     setHasMore(true);
     fetchVideos(query, 1, false);
   };
@@ -242,6 +250,8 @@ export default function Home() {
             setInputVal('');
             setCurrentQuery('trending music 2026');
             setPage(1);
+            setNextPageToken(null);
+            setHasMore(true);
             fetchVideos('trending music 2026', 1, false);
           }}
         >
@@ -280,6 +290,17 @@ export default function Home() {
       </div>
 
       {/* Kho bài hát / Gợi ý với tính năng Lazy Load */}
+      {searchError && (
+        <p role="alert" className="mx-auto w-full max-w-7xl px-4 text-sm text-red-400 md:px-8">
+          {searchError}
+        </p>
+      )}
+      {loading && videos.length === 0 && (
+        <p className="mx-auto w-full max-w-7xl px-4 text-sm text-zinc-400 md:px-8">Đang tìm video...</p>
+      )}
+      {!loading && !searchError && videos.length === 0 && (
+        <p className="mx-auto w-full max-w-7xl px-4 text-sm text-zinc-400 md:px-8">Không tìm thấy video phù hợp.</p>
+      )}
       <VideoGrid 
         videos={videos} 
         onAdd={addToPlaylist} 
