@@ -1,0 +1,93 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id               String          @id @default(uuid())
+  email            String          @unique
+  fullName         String
+  department       String          // Ví dụ: Khoa Cấp Cứu
+  role             Role            @default(STAFF)
+  evaluatorMaps    EvaluationMap[] @relation("EvaluatorRelation")
+  evaluateeMaps    EvaluationMap[] @relation("EvaluateeRelation")
+  projectSummaries ProjectSummary[] // <--- Thêm dòng này vào model User
+  createdAt        DateTime        @default(now())
+}
+
+enum Role {
+  ADMIN
+  STAFF
+}
+
+model Project {
+  id          String           @id @default(uuid())
+  title       String           // Ví dụ: Đánh giá 360 độ Quý 4/2026
+  startDate   DateTime         @default(now())
+  endDate     DateTime         @default(now())
+  isActive    Boolean          @default(true)
+  evaluations EvaluationMap[]
+  summaries   ProjectSummary[] // <--- Thêm dòng này vào model Project
+  createdAt   DateTime         @default(now())
+}
+
+model EvaluationMap {
+  id            String          @id @default(uuid())
+  token         String          @unique @default(uuid()) // Link direct cho nhân viên làm form
+  projectId     String
+  project       Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  evaluatorId   String          // Người đi đánh giá
+  evaluator     User            @relation("EvaluatorRelation", fields: [evaluatorId], references: [id])
+  evaluateeId   String          // Người được đánh giá
+  evaluatee     User            @relation("EvaluateeRelation", fields: [evaluateeId], references: [id])
+  isCompleted   Boolean         @default(false)
+  survey        SurveyResponse?
+
+  @@unique([projectId, evaluatorId, evaluateeId])
+}
+
+model SurveyResponse {
+  id              String        @id @default(uuid())
+  evaluationMapId String        @unique
+  evaluationMap   EvaluationMap @relation(fields: [evaluationMapId], references: [id], onDelete: Cascade)
+  
+  scores          Json          // Lưu object: { "TC1": 4, "TC2": 5, ..., "TC20": 4 }
+  avgTotalScore   Float         // Điểm trung bình tổng có trọng số
+  trustPercent    Float         // % Mức độ tín nhiệm
+  classification  String        // Xếp loại (Tín nhiệm cao, Tín nhiệm, ...)
+  createdAt       DateTime      @default(now())
+}
+
+model ProjectSummary {
+  id              String         @id @default(uuid())
+  projectId       String
+  project         Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  userId          String         // Nhân viên được đánh giá
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  totalEvaluators Int            // Tổng số người được phân công đánh giá
+  completedCount  Int            // Số người đã hoàn thành phiếu
+  avgTotalScore   Float          // Điểm trung bình tổng cộng của tất cả phiếu
+  trustPercent    Float          // % Mức độ tín nhiệm trung bình
+  classification  String         // Xếp loại chung
+  
+  updatedAt       DateTime       @updatedAt
+
+  @@unique([projectId, userId])
+}
+
+model Criteria {
+  id          String   @id @default(cuid())
+  stt         Int      // Số thứ tự
+  category    String   // Nhóm (VD: I. PHẨM CHẤT CỦA CBNV)
+  title       String   // Tên tiêu chí (VD: Yêu nước, Khát vọng...)
+  description String   @db.Text // Mô tả chi tiết
+  weight      Float    // Trọng số / hệ số điểm
+  projectId   String?  // (Tùy chọn) Nếu mỗi dự án có bộ tiêu chí riêng, hoặc để trống nếu dùng chung toàn hệ thống
+  createdAt   DateTime @default(now())
+}

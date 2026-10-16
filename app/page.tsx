@@ -72,17 +72,17 @@ export default function Home() {
               </h2>
               
               <p className="text-slate-600 text-sm leading-relaxed">
-                Phân tích dữ liệu khảo sát tín nhiệm đa chiều, tự động tổng hợp điểm KPI và xếp loại khen thưởng cán bộ y tế, điều dưỡng trong khoa.
+               Tạo dự án đánh giá 360° cho nhân viên, quản lý các vòng đánh giá, và xuất báo cáo tổng hợp kết quả đánh giá theo chuẩn y khoa.
               </p>
 
               <ul className="space-y-2 pt-2 text-xs text-slate-500">
                 <li className="flex items-center space-x-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Xử lý file khảo sát định dạng Excel (.xlsx, .csv)</span>
+                  <span>Tạo dự án đánh giá, phân công người đánh giá và được đánh giá</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Tạo bằng khen cho nhân viên xuất sắc tiện lợi</span>
+                  <span>Lưu trữ thông tin các đợt đánh giá và kết quả phục vụ phân tích</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />

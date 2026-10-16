@@ -3,19 +3,23 @@ import ytSearch from 'yt-search';
 
 export async function GET() {
   try {
-    // Lấy danh sách video gợi ý/phổ biến dựa trên từ khóa chung hoặc trending
-    const searchResult = await ytSearch('Vietnam music trending news 2026');
-    const videos = searchResult.videos.slice(0, 16).map((v) => ({
-      title: v.title,
-      videoId: v.videoId,
-      thumbnail: v.thumbnail,
-      author: v.author.name,
-      timestamp: v.timestamp,
-      views: v.views,
+    // Dùng từ khóa xu hướng phổ biến để cào danh sách video nổi bật
+    const result = await ytSearch('trending music 2026'); 
+    
+    const videos = result.videos.slice(0, 16).map((video) => ({
+      title: video.title,
+      videoId: video.videoId,
+      thumbnail: video.thumbnail || `https://i.ytimg.com/vi/${video.videoId}/hqdefault.jpg`,
+      author: video.author.name,
+      timestamp: video.timestamp,
     }));
 
     return NextResponse.json({ videos });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Lỗi lấy trang chủ' }, { status: 500 });
+  } catch (error) {
+    console.error('YouTube trending failed:', error);
+    return NextResponse.json(
+      { error: 'Không thể tải danh sách thịnh hành lúc này.' },
+      { status: 502 }
+    );
   }
 }
