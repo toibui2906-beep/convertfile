@@ -217,18 +217,6 @@ export default function Page360Home() {
             >
               <Users className="h-4 w-4 text-slate-500" /> Quản lý Users
             </button>
-            <button 
-              onClick={() => handleProtectedNavigation('/360/admin/projects')}
-              className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
-            >
-              <FolderKanban className="h-4 w-4 text-slate-500" /> Quản lý Projects
-            </button>
-            <button 
-              onClick={() => handleProtectedNavigation('/360/admin/assignments')}
-              className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
-            >
-              <Activity className="h-4 w-4 text-slate-500" /> Quản lý Assignments
-            </button>
           </div>
         </div>
 
