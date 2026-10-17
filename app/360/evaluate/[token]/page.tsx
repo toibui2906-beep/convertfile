@@ -82,7 +82,6 @@ function SurveyFormContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     // Kiểm tra số lượng tiêu chí động hiện tại
     const answeredCount = Object.keys(scores).length;
     if (answeredCount < criteriaList.length) {

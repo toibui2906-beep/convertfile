@@ -215,7 +215,13 @@ export default function Page360Home() {
               onClick={() => handleProtectedNavigation('/360/admin/users')} 
               className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
             >
-              <Users className="h-4 w-4 text-slate-500" /> Quản lý Users
+              <Users className="h-4 w-4 text-slate-500" /> Quản lý tài khoản
+            </button>
+            <button
+              onClick={() => handleProtectedNavigation('/360/admin/criteria')} 
+              className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
+            >
+              <Users className="h-4 w-4 text-slate-500" /> Xây dựng bộ chỉ tiêu
             </button>
           </div>
         </div>
