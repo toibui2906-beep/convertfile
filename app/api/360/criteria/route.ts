@@ -1,34 +1,65 @@
 import { NextResponse } from 'next/server';
-// import { db } from '@/lib/db'; // Đường dẫn đến prisma client của bạn
+import { prisma } from '../../../lib/prisma'; // Đảm bảo đường dẫn này trỏ đúng tới Prisma Client của bạn
 
-// GET: Lấy danh sách tiêu chí
-export async function GET() {
+// GET: Lấy danh sách tiêu chí từ Database, sắp xếp theo stt tăng dần
+export async function GET(request: Request) {
   try {
-    // const criteria = await db.criteria.findMany({ orderBy: { stt: 'asc' } });
-    
-    // Dữ liệu mẫu (thay thế bằng db.criteria.findMany khi đã cấu hình DB)
-    const criteria = [
-      { id: 'TC1', stt: 1, category: 'I. PHẨM CHẤT CỦA CBNV', title: 'Yêu nước', description: 'Suy nghĩ và hành động vì lợi ích chung...', weight: 1.5 },
-    ];
+    // Lấy thêm query param 'projectId' nếu bạn muốn lọc theo dự án (tùy chọn)
+    const { searchParams } = new URL(request.url);
+    const projectId = searchParams.get('projectId');
 
-    return NextResponse.json(criteria);
+    // Nếu có projectId, có thể lọc theo project hoặc lấy chung (tùy logic hệ thống của bạn)
+    // Ở đây mình lấy tất cả hoặc lọc theo projectId nếu được truyền vào
+    const criteria = await prisma.criteria.findMany({
+      where: projectId ? { projectId } : undefined,
+      orderBy: { stt: 'asc' },
+    });
+
+    return NextResponse.json(criteria, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ message: 'Lỗi tải danh sách tiêu chí' }, { status: 500 });
+    console.error('Lỗi khi lấy danh sách tiêu chí:', error);
+    return NextResponse.json(
+      { message: 'Lỗi tải danh sách tiêu chí', error: (error as Error).message },
+      { status: 500 }
+    );
   }
 }
 
-// POST: Thêm mới tiêu chí
+// POST: Thêm mới tiêu chí vào Database
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { stt, category, title, description, weight } = body;
+    const { stt, category, title, description, weight, projectId } = body;
 
-    // const newCriteria = await db.criteria.create({
-    //   data: { stt: Number(stt), category, title, description, weight: Number(weight) }
-    // });
+    // Kiểm tra các trường bắt buộc cơ bản
+    if (stt === undefined || !category || !title || weight === undefined) {
+      return NextResponse.json(
+        { message: 'Thiếu các trường bắt buộc (stt, category, title, weight)' },
+        { status: 400 }
+      );
+    }
 
-    return NextResponse.json({ message: 'Thêm tiêu chí thành công', data: body }, { status: 201 });
+    // Tạo mới bản ghi trong Database bằng Prisma
+    const newCriteria = await prisma.criteria.create({
+      data: {
+        stt: Number(stt),
+        category,
+        title,
+        description: description || '',
+        weight: Number(weight),
+        projectId: projectId || null, // Nếu không truyền thì để null (dùng chung toàn hệ thống)
+      },
+    });
+
+    return NextResponse.json(
+      { message: 'Thêm tiêu chí thành công', data: newCriteria },
+      { status: 201 }
+    );
   } catch (error) {
-    return NextResponse.json({ message: 'Lỗi khi thêm tiêu chí' }, { status: 500 });
+    console.error('Lỗi khi thêm tiêu chí:', error);
+    return NextResponse.json(
+      { message: 'Lỗi khi thêm tiêu chí', error: (error as Error).message },
+      { status: 500 }
+    );
   }
 }
