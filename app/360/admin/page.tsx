@@ -54,9 +54,9 @@ async function AdminDashboardContent() {
     // Đếm số lượng dự án từ bảng projects
     totalProjects = await prisma.project.count();
 
-    // Đếm số lượng phân công (nếu có model Assignment)
-    if (prisma.assignment) {
-      totalAssignments = await prisma.assignment.count();
+    // Đếm số lượng phân công (nếu có model EvaluationMap)
+    if (prisma.evaluationMap) {
+      totalAssignments = await prisma.evaluationMap.count();
     }
   } catch (error) {
     console.error('Lỗi khi truy vấn cơ sở dữ liệu:', error);
