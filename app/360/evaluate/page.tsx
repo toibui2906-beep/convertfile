@@ -171,7 +171,7 @@ export default function EvaluationsHubPage() {
               return (
                 <div 
                   key={item.id}
-                  onClick={() => router.push(`/evaluations/${item.id}`)}
+                  onClick={() => router.push(`/360/evaluations/${item.id}`)}
                   className={`bg-white rounded-2xl border p-5 transition cursor-pointer flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group ${
                     isCompleted ? 'border-slate-200 bg-slate-50/50 hover:border-slate-300' : 'border-amber-200 bg-white hover:border-emerald-400 shadow-sm'
                   }`}
