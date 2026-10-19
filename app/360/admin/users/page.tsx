@@ -12,7 +12,8 @@ import {
   ShieldCheck, 
   X, 
   Check, 
-  RefreshCw 
+  RefreshCw,
+  KeyRound 
 } from 'lucide-react';
 
 interface User {
@@ -34,10 +35,11 @@ export default function AdminUsersPage() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // Form States
+  // Form States (Thêm trường password)
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
+    password: '', // Thêm password vào form state
     department: 'Khoa Cấp Cứu',
     role: 'STAFF' as 'ADMIN' | 'STAFF',
   });
@@ -69,6 +71,7 @@ export default function AdminUsersPage() {
       setFormData({
         fullName: user.fullName,
         email: user.email,
+        password: '', // Khi sửa để trống, nếu nhập thì sẽ đổi mật khẩu mới
         department: user.department,
         role: user.role,
       });
@@ -77,6 +80,7 @@ export default function AdminUsersPage() {
       setFormData({
         fullName: '',
         email: '',
+        password: '',
         department: 'Khoa Cấp Cứu',
         role: 'STAFF',
       });
@@ -91,16 +95,25 @@ export default function AdminUsersPage() {
 
     try {
       if (editingUser) {
-        // Call PATCH
+        // Call PATCH (Nếu password để trống, có thể loại bỏ hoặc gửi lên tùy API xử lý)
+        const payload: any = { ...formData };
+        if (!payload.password) delete payload.password; // Không gửi nếu không đổi mật khẩu
+
         const res = await fetch(`/api/360/users/${editingUser.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(payload),
         });
 
         if (!res.ok) throw new Error('Cập nhật nhân sự thất bại.');
       } else {
-        // Call POST
+        // Call POST (Tạo mới bắt buộc phải có password)
+        if (!formData.password) {
+          alert('Vui lòng nhập mật khẩu cho nhân sự mới.');
+          setSubmitting(false);
+          return;
+        }
+
         const res = await fetch('/api/360/users', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -286,7 +299,7 @@ export default function AdminUsersPage() {
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   placeholder="VD: BS. Nguyễn Văn A"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-emerald-200 text-slate-900"
                   required
                 />
               </div>
@@ -298,9 +311,27 @@ export default function AdminUsersPage() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="nguyenvana@hospital.com"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-emerald-200 text-slate-900"
                   required
                 />
+              </div>
+
+              {/* Ô nhập Mật khẩu */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                  {editingUser ? 'Mật khẩu mới (Bỏ trống nếu không đổi)' : 'Mật khẩu đăng nhập'}
+                </label>
+                <div className="relative">
+                  <input
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    placeholder={editingUser ? '••••••••' : 'Nhập mật khẩu...'}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-emerald-200 text-slate-900"
+                    {...(!editingUser ? { required: true } : {})}
+                  />
+                  <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                </div>
               </div>
 
               <div>
@@ -310,7 +341,7 @@ export default function AdminUsersPage() {
                   value={formData.department}
                   onChange={(e) => setFormData({ ...formData, department: e.target.value })}
                   placeholder="Khoa Cấp Cứu"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-emerald-200 text-slate-900"
                   required
                 />
               </div>
@@ -320,7 +351,7 @@ export default function AdminUsersPage() {
                 <select
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value as 'ADMIN' | 'STAFF' })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-emerald-200 bg-white"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-emerald-200 bg-white text-slate-900"
                 >
                   <option value="STAFF">STAFF (Nhân sự)</option>
                   <option value="ADMIN">ADMIN (Quản trị)</option>

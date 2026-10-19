@@ -1,27 +1,52 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
+import bcrypt from 'bcryptjs';
 
-// Lấy danh sách nhân sự
-export async function GET() {
-  try {
-    const users = await prisma.user.findMany({
-      orderBy: { fullName: 'asc' },
-    });
-    return NextResponse.json(users);
-  } catch (error) {
-    return NextResponse.json({ message: 'Lỗi lấy danh sách user' }, { status: 500 });
-  }
-}
-
-// Thêm nhân sự mới
 export async function POST(request: Request) {
   try {
-    const { email, fullName, department, role } = await request.json();
-    const newUser = await prisma.user.create({
-      data: { email, fullName, department, role: role || 'STAFF' },
+    const body = await request.json();
+    const { fullName, email, password, department, role } = body;
+
+    if (!email || !password || !fullName) {
+      return NextResponse.json(
+        { message: 'Vui lòng điền đầy đủ các trường bắt buộc.' },
+        { status: 400 }
+      );
+    }
+
+    // Kiểm tra xem email đã tồn tại chưa
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
     });
-    return NextResponse.json(newUser);
+
+    if (existingUser) {
+      return NextResponse.json(
+        { message: 'Email này đã tồn tại trong hệ thống.' },
+        { status: 400 }
+      );
+    }
+
+    // BẮT BUỘC: Băm (hash) mật khẩu bằng bcryptjs trước khi lưu vào DB
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await prisma.user.create({
+      data: {
+        fullName,
+        email,
+        password: hashedPassword, // Lưu chuỗi đã mã hóa
+        department: department || 'Khoa Cấp Cứu',
+        role: role || 'STAFF',
+      },
+    });
+
+    const { password: _, ...userWithoutPassword } = newUser as any;
+
+    return NextResponse.json(userWithoutPassword, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ message: 'Lỗi tạo user (Email có thể đã tồn tại)' }, { status: 500 });
+    console.error('Lỗi tạo user:', error);
+    return NextResponse.json(
+      { message: 'Không thể tạo nhân sự mới.' },
+      { status: 500 }
+    );
   }
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '../../../../lib/prisma';
+import { prisma } from '../../../../lib/prisma'; // Hoặc '@/lib/prisma'
+import bcrypt from 'bcryptjs';
 
 // 1. Cập nhật thông tin User (PATCH)
 export async function PATCH(
@@ -9,19 +10,31 @@ export async function PATCH(
   try {
     const { id } = await context.params;
     const body = await request.json();
-    const { email, fullName, department, role } = body;
+    const { email, fullName, department, role, password } = body;
+
+    // Chuẩn bị object dữ liệu cần update
+    const updateData: Record<string, any> = {
+      ...(email && { email }),
+      ...(fullName && { fullName }),
+      ...(department && { department }),
+      ...(role && { role }),
+    };
+
+    // Nếu người dùng có nhập mật khẩu mới, tiến hành băm (hash) trước khi lưu
+    if (password && password.trim() !== '') {
+      const saltRounds = 10;
+      updateData.password = await bcrypt.hash(password, saltRounds);
+    }
 
     const updatedUser = await prisma.user.update({
       where: { id },
-      data: {
-        ...(email && { email }),
-        ...(fullName && { fullName }),
-        ...(department && { department }),
-        ...(role && { role }),
-      },
+      data: updateData,
     });
 
-    return NextResponse.json(updatedUser);
+    // Ẩn trường password trước khi trả về response cho client
+    const { password: _, ...userWithoutPassword } = updatedUser as any;
+
+    return NextResponse.json(userWithoutPassword);
   } catch (error) {
     console.error('Lỗi cập nhật user:', error);
     return NextResponse.json(
@@ -39,7 +52,6 @@ export async function DELETE(
   try {
     const { id } = await context.params;
 
-    // Tiến hành xóa user trong cơ sở dữ liệu
     await prisma.user.delete({
       where: { id },
     });
