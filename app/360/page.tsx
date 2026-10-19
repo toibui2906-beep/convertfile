@@ -139,7 +139,7 @@ export default function Page360Home() {
               </div>
 
               <h2 className="mb-2 text-lg font-semibold text-slate-900">
-                Tạo mới đợt đánh giá
+                Quản lý dự án đánh giá năng lực
               </h2>
               <p className="mb-5 text-sm leading-6 text-slate-600">
                 Tạo mới đợt đánh giá năng lực, phân công người đánh giá và người được đánh giá, quản lý các phiếu đánh giá.
