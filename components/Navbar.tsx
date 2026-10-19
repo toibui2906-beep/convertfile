@@ -15,7 +15,8 @@ import {
   ShieldCheck, 
   X, 
   Lock,
-  User 
+  User,
+  Menu
 } from "lucide-react";
 
 export default function Navbar() {
@@ -27,6 +28,7 @@ export default function Navbar() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [userName, setUserName] = useState('Admin');
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showMobileNav, setShowMobileNav] = useState(false);
   const [account, setAccount] = useState(''); // email đăng nhập
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -179,12 +181,12 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-white shadow-md">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
           
           {/* Logo & Tên Hệ Thống */}
           <Link 
             href="/" 
-            className="flex items-center space-x-3 group transition shrink-0"
+            className="flex items-center space-x-2 sm:space-x-3 group transition shrink-0"
           >
             <div className="p-2 bg-emerald-500/20 border border-emerald-400/30 rounded-xl group-hover:bg-emerald-500/30 transition">
               <Activity className="w-5 h-5 text-emerald-400" />
@@ -193,7 +195,7 @@ export default function Navbar() {
               <span className="font-extrabold text-base tracking-tight block leading-none">
                 Khoa Cấp cứu
               </span>
-              <span className="text-[11px] text-slate-400 font-medium block mt-1">
+              <span className="hidden sm:block text-[11px] text-slate-400 font-medium mt-1">
                 Hệ thống hỗ trợ quản lý y tế
               </span>
             </div>
@@ -223,7 +225,7 @@ export default function Navbar() {
           </nav>
 
           {/* Góc phải: Trạng thái & Đăng nhập / Đăng xuất */}
-          <div className="flex items-center space-x-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {isAdminLoggedIn ? (
               <div className="flex items-center space-x-2 bg-slate-800/80 p-1.5 pl-3 rounded-xl border border-slate-700">
                 <div className="flex items-center space-x-2">
@@ -252,18 +254,50 @@ export default function Navbar() {
                 className="inline-flex items-center space-x-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-sm transition"
               >
                 <LogIn className="w-4 h-4" />
-                <span>Đăng Nhập</span>
+                <span className="hidden min-[360px]:inline">Đăng Nhập</span>
               </button>
             )}
+            <button
+              type="button"
+              onClick={() => setShowMobileNav((open) => !open)}
+              aria-label={showMobileNav ? 'Đóng menu điều hướng' : 'Mở menu điều hướng'}
+              aria-expanded={showMobileNav}
+              className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-200 hover:bg-slate-800"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
           </div>
 
         </div>
+
+        {showMobileNav && (
+          <nav className="md:hidden border-t border-slate-800 bg-slate-900 px-3 py-2">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href;
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setShowMobileNav(false)}
+                  className={`flex min-h-11 items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold ${
+                    isActive ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        )}
       </header>
 
       {/* MODAL ĐĂNG NHẬP */}
       {showLoginModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <form onSubmit={handleLogin} className="bg-white text-slate-800 rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/60 p-3 backdrop-blur-sm sm:items-center sm:p-4">
+          <form onSubmit={handleLogin} className="my-auto max-h-[calc(100dvh-1.5rem)] w-full max-w-sm space-y-4 overflow-y-auto rounded-2xl bg-white p-5 text-slate-800 shadow-2xl sm:p-6">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <h3 className="text-lg font-bold text-slate-800 flex items-center space-x-2">
                 <ShieldCheck className="w-5 h-5 text-emerald-600" />

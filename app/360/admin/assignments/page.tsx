@@ -300,7 +300,8 @@ export default function AdminAssignmentsPage() {
         <div className="p-4 bg-slate-50 border-b border-slate-200 font-bold text-slate-700 text-sm">
           Danh Sách Phân Công & Theo Dõi Tiến Độ ({assignments.length})
         </div>
-        <table className="w-full text-sm text-left text-slate-600">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[760px] text-sm text-left text-slate-600">
           <thead className="bg-slate-50 text-slate-700 font-bold text-xs uppercase border-b border-slate-200">
             <tr>
               <th className="p-4">Người Đánh Giá</th>
@@ -383,6 +384,7 @@ export default function AdminAssignmentsPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

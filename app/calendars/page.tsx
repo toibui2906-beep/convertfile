@@ -85,7 +85,7 @@ export default function RosterConverterPage() {
     <main className="min-h-screen bg-slate-50/80 text-slate-900 pb-16">
       
       {/* HERO HEADER - Đồng bộ chuẩn thiết kế với trang 360 */}
-      <header className="bg-gradient-to-r from-emerald-800 via-teal-800 to-slate-900 text-white pt-10 pb-20 px-6 shadow-md relative overflow-hidden">
+      <header className="bg-gradient-to-r from-emerald-800 via-teal-800 to-slate-900 text-white pt-8 pb-16 px-4 sm:px-6 md:pt-10 md:pb-20 shadow-md relative overflow-hidden">
         <div className="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">
           <Calendar className="w-96 h-96 text-white" />
         </div>
@@ -106,9 +106,9 @@ export default function RosterConverterPage() {
             </p>
           </div>
 
-          <div className="flex items-center space-x-3 bg-white/10 backdrop-blur-md border border-white/10 p-4 rounded-2xl shrink-0">
-            <ShieldCheck className="w-10 h-10 text-emerald-400" />
-            <div>
+          <div className="flex min-w-0 items-center gap-3 bg-white/10 backdrop-blur-md border border-white/10 p-3 sm:p-4 rounded-2xl shrink-0">
+            <ShieldCheck className="w-10 h-10 text-emerald-400 shrink-0" />
+            <div className="min-w-0">
               <p className="text-xs text-slate-300 font-medium">Phân hệ y tế</p>
               <p className="text-sm font-bold text-white">Quản lý lịch trực & nhân sự</p>
             </div>
@@ -117,7 +117,7 @@ export default function RosterConverterPage() {
       </header>
 
       {/* Main Container - Căn chỉnh đồng bộ -10mt như trang 360 */}
-      <div className="max-w-7xl mx-auto px-6 -mt-10 space-y-8 relative z-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-8 sm:-mt-10 space-y-6 sm:space-y-8 relative z-20">
 
         {/* Feature Cards Grid - Đồng bộ style card trắng bo góc 2xl */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">

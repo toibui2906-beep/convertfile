@@ -185,8 +185,8 @@ export default function AdminProjectsPage() {
       </div>
 
       {/* PROJECT TABLE */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <table className="w-full text-sm text-left text-slate-600">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-x-auto">
+        <table className="w-full min-w-[720px] text-sm text-left text-slate-600">
           <thead className="bg-slate-50 text-slate-700 font-bold text-xs uppercase border-b border-slate-200">
             <tr>
               <th className="p-4">Tên Dự Án / Đợt Đánh Giá</th>

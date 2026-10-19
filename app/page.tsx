@@ -18,7 +18,7 @@ export default function Home() {
     <main className="min-h-screen bg-slate-50/80 text-slate-900 pb-16">
       
       {/* HERO HEADER */}
-      <header className="bg-gradient-to-r from-emerald-800 via-teal-800 to-slate-900 text-white pt-12 pb-24 px-6 shadow-md relative overflow-hidden">
+      <header className="bg-gradient-to-r from-emerald-800 via-teal-800 to-slate-900 text-white pt-10 pb-20 px-4 sm:px-6 md:pt-12 md:pb-24 shadow-md relative overflow-hidden">
         <div className="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">
           <Activity className="w-96 h-96 text-white" />
         </div>
@@ -39,9 +39,9 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="flex items-center space-x-3 bg-white/10 backdrop-blur-md border border-white/10 p-4 rounded-2xl shrink-0">
-            <Building2 className="w-10 h-10 text-emerald-400" />
-            <div>
+          <div className="flex min-w-0 items-center gap-3 bg-white/10 backdrop-blur-md border border-white/10 p-3 sm:p-4 rounded-2xl shrink-0">
+            <Building2 className="w-10 h-10 text-emerald-400 shrink-0" />
+            <div className="min-w-0">
               <p className="text-xs text-slate-300 font-medium">Đơn vị sử dụng</p>
               <p className="text-sm font-bold text-white">Khoa Cấp cứu - Bệnh viện ĐKQT Vinmec Times City</p>
             </div>
@@ -50,13 +50,13 @@ export default function Home() {
       </header>
 
       {/* MAIN CONTENT CONTAINERS */}
-      <div className="max-w-7xl mx-auto px-6 -mt-12 space-y-8 relative z-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-10 sm:-mt-12 space-y-6 sm:space-y-8 relative z-20">
 
         {/* CARDS LỐI VÀO PHÂN HỆ */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* Card 1: Đánh giá 360 */}
-          <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200/80 p-8 flex flex-col justify-between hover:border-emerald-500/50 transition-all duration-200 group">
+          <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200/80 p-5 sm:p-8 flex flex-col justify-between hover:border-emerald-500/50 transition-all duration-200 group">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="p-3.5 bg-emerald-50 text-emerald-600 rounded-2xl group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-200">
@@ -103,7 +103,7 @@ export default function Home() {
           </div>
 
           {/* Card 2: Chuyển đổi lịch trực */}
-          <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200/80 p-8 flex flex-col justify-between hover:border-emerald-500/50 transition-all duration-200 group">
+          <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200/80 p-5 sm:p-8 flex flex-col justify-between hover:border-emerald-500/50 transition-all duration-200 group">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="p-3.5 bg-teal-50 text-teal-600 rounded-2xl group-hover:bg-teal-600 group-hover:text-white transition-colors duration-200">

@@ -33,7 +33,7 @@ export default function RootLayout({
         </Suspense>
 
         {/* Nội dung các trang con */}
-        <main className="flex-1 max-w-7xl w-full mx-auto p-6">
+        <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6">
           {children}
         </main>
       </body>

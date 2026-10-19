@@ -10,7 +10,7 @@ generator client {
 model User {
   id               String           @id @default(uuid())
   email            String           @unique
-  password         String          // <--- Thêm trường lưu mật khẩu (đã hash)
+  password         String?          // <--- Thêm trường lưu mật khẩu (đã hash)
   fullName         String
   department       String           // Ví dụ: Khoa Cấp Cứu
   role             Role             @default(STAFF)
@@ -18,6 +18,7 @@ model User {
   evaluateeMaps    EvaluationMap[]  @relation("EvaluateeRelation")
   projectSummaries ProjectSummary[]
   createdAt        DateTime         @default(now())
+  updatedAt        DateTime?         @updatedAt // <--- Thêm dòng này vào
 }
 
 enum Role {

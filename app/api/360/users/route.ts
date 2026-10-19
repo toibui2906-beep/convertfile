@@ -2,6 +2,34 @@ import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import bcrypt from 'bcryptjs';
 
+// 1. Phương thức GET: Lấy danh sách nhân sự
+export async function GET() {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        department: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    return NextResponse.json(users, { status: 200 });
+  } catch (error) {
+    console.error('Lỗi chi tiết:', error);
+    return NextResponse.json(
+      { message: 'Không thể tải danh sách nhân sự.', error: String(error) },
+      { status: 500 }
+    );
+  }
+}
+
+// 2. Phương thức POST: Tạo nhân sự mới (giữ nguyên logic của bạn)
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -26,19 +54,20 @@ export async function POST(request: Request) {
       );
     }
 
-    // BẮT BUỘC: Băm (hash) mật khẩu bằng bcryptjs trước khi lưu vào DB
+    // Băm (hash) mật khẩu trước khi lưu
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await prisma.user.create({
       data: {
         fullName,
         email,
-        password: hashedPassword, // Lưu chuỗi đã mã hóa
+        password: hashedPassword,
         department: department || 'Khoa Cấp Cứu',
         role: role || 'STAFF',
       },
     });
 
+    // Loại bỏ password trước khi trả về client
     const { password: _, ...userWithoutPassword } = newUser as any;
 
     return NextResponse.json(userWithoutPassword, { status: 201 });
