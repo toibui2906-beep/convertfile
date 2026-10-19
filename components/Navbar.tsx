@@ -336,10 +336,10 @@ export default function Navbar() {
                 <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Email đăng nhập</label>
                 <div className="relative">
                   <input
-                    type="email"
+                    type="username"
                     value={account}
                     onChange={(e) => setAccount(e.target.value)}
-                    placeholder="admin@hospital.vn"
+                    placeholder="Namnt2"
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
                     required
                     autoFocus
