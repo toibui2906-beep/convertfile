@@ -4,22 +4,14 @@ import { prisma } from '../../../../lib/prisma';
 
 export async function GET(request: Request) {
   try {
-    const cookieHeader = request.headers.get('cookie') || '';
     const { searchParams } = new URL(request.url);
     const requestedUserId = searchParams.get('userId');
-    const isAdminParam = searchParams.get('isAdmin');
-
-    // 🔒 Phân quyền an toàn: Chỉ chấp nhận là Admin khi có cookie phiên đăng nhập admin 
-    // HOẶC request từ client gửi cờ chính xác và KHÔNG bị ép buộc lọc theo user thường.
-    const isAdminSession = 
-      cookieHeader.includes('admin_session=') || 
-      cookieHeader.includes('isAdminLoggedIn=true') || 
-      (isAdminParam === 'true' && !requestedUserId);
+    const userRole = searchParams.get('role'); // Nhận role từ client gửi lên (hoặc lấy từ session/cookie)
 
     let evaluations;
 
-    if (isAdminSession) {
-      // 👑 ADMIN: Lấy toàn bộ phiếu đánh giá trong hệ thống
+    // 👑 Nếu role là ADMIN -> Lấy toàn bộ phiếu trong hệ thống
+    if (userRole === 'ADMIN') {
       evaluations = await prisma.evaluationMap.findMany({
         include: {
           project: { select: { id: true, title: true } },
@@ -29,10 +21,14 @@ export async function GET(request: Request) {
         },
         orderBy: { isCompleted: 'asc' },
       });
-    } else {
-      // 👤 USER THƯỜNG / STAFF: Bắt buộc phải có userId và chỉ lấy phiếu của chính họ
+    } 
+    // 👤 Nếu role là STAFF (hoặc không phải admin) -> Bắt buộc phải có userId và chỉ lấy phiếu của đúng user đó
+    else {
       if (!requestedUserId) {
-        return NextResponse.json({ message: 'Unauthorized: Thiếu thông tin định danh người dùng' }, { status: 401 });
+        return NextResponse.json(
+          { message: 'Unauthorized: Thiếu thông tin định danh người dùng (userId)' }, 
+          { status: 401 }
+        );
       }
 
       evaluations = await prisma.evaluationMap.findMany({

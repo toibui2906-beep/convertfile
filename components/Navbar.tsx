@@ -16,7 +16,8 @@ import {
   X, 
   Lock,
   User,
-  Menu
+  Menu,
+  UserCog 
 } from "lucide-react";
 
 export default function Navbar() {
@@ -34,13 +35,13 @@ export default function Navbar() {
   const [submitting, setSubmitting] = useState(false);
   const [redirectAfterLogin, setRedirectAfterLogin] = useState<string | null>(null);
 
-  // Kiểm tra trạng thái đăng nhập từ localStorage và lắng nghe sự kiện mở modal từ các component khác
+  // Kiểm tra trạng thái đăng nhập từ localStorage và lắng nghe sự kiện
   useEffect(() => {
     const checkLoginState = () => {
       const loggedIn = localStorage.getItem('isAdminLoggedIn');
       const storedName = localStorage.getItem('userFullName');
       
-      if (loggedIn === 'true') {
+      if (loggedIn === 'true' || loggedIn === 'false') {
         setIsAdminLoggedIn(true);
         if (storedName) {
           setUserName(storedName);
@@ -53,6 +54,7 @@ export default function Navbar() {
 
     checkLoginState();
     window.addEventListener('storage', checkLoginState);
+    window.addEventListener('auth-state-changed', checkLoginState);
 
     // Lắng nghe sự kiện yêu cầu mở modal từ các trang/component khác
     const handleOpenModalEvent = (event: Event) => {
@@ -64,6 +66,7 @@ export default function Navbar() {
 
     return () => {
       window.removeEventListener('storage', checkLoginState);
+      window.removeEventListener('auth-state-changed', checkLoginState);
       window.removeEventListener('open-login-modal', handleOpenModalEvent);
     };
   }, []);
@@ -100,25 +103,25 @@ export default function Navbar() {
       if (res.ok && data.success) {
         setIsAdminLoggedIn(true);
         
-        // 🛠️ Lưu đầy đủ thông tin chuẩn khớp với API và Database Model User
         const userRole = data.user?.role || 'STAFF';
         const userId = data.user?.id || '';
         const userFullName = data.user?.fullName || data.user?.email || 'Thành viên';
 
-        localStorage.setItem('isAdminLoggedIn', userRole === 'ADMIN' ? 'true' : 'false');
+        localStorage.setItem('isAdminLoggedIn', 'true');
         localStorage.setItem('userRole', userRole);
         localStorage.setItem('userId', userId);
         localStorage.setItem('userFullName', userFullName);
         window.dispatchEvent(new Event('auth-state-changed'));
 
         setUserName(userFullName);
-
         setShowLoginModal(false);
         setAccount('');
         setPassword('');
 
         if (redirectAfterLogin && redirectAfterLogin !== pathname) {
           router.push(redirectAfterLogin);
+        } else {
+          router.push('/me');
         }
         setRedirectAfterLogin(null);
         router.refresh();
@@ -143,39 +146,23 @@ export default function Navbar() {
         setIsAdminLoggedIn(false);
         setUserName('Admin');
         
-        // Xóa sạch toàn bộ thông tin trong localStorage
         localStorage.removeItem('isAdminLoggedIn');
         localStorage.removeItem('userRole');
         localStorage.removeItem('userId');
         localStorage.removeItem('userFullName');
         window.dispatchEvent(new Event('auth-state-changed'));
 
+        router.push('/');
         router.refresh();
       }
     }
   };
 
   const navItems = [
-    {
-      name: "Trang chủ",
-      href: "/",
-      icon: Home,
-    },
-    {
-      name: "Đánh giá 360°",
-      href: "/360",
-      icon: Award,
-    },
-    {
-      name: "Chuyển đổi lịch trực",
-      href: "/calendars",
-      icon: Calendar,
-    },
-    {
-      name: "Bằng khen thưởng",
-      href: "/award",
-      icon: Trophy,
-    },
+    { name: "Trang chủ", href: "/", icon: Home },
+    { name: "Đánh giá 360°", href: "/360", icon: Award },
+    { name: "Chuyển đổi lịch trực", href: "/calendars", icon: Calendar },
+    { name: "Bằng khen thưởng", href: "/award", icon: Trophy },
   ];
 
   return (
@@ -184,10 +171,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
           
           {/* Logo & Tên Hệ Thống */}
-          <Link 
-            href="/" 
-            className="flex items-center space-x-2 sm:space-x-3 group transition shrink-0"
-          >
+          <Link href="/" className="flex items-center space-x-2 sm:space-x-3 group transition shrink-0">
             <div className="p-2 bg-emerald-500/20 border border-emerald-400/30 rounded-xl group-hover:bg-emerald-500/30 transition">
               <Activity className="w-5 h-5 text-emerald-400" />
             </div>
@@ -201,7 +185,7 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Navigation Items */}
+          {/* Navigation Items (Menu chính) */}
           <nav className="hidden md:flex items-center space-x-1 sm:space-x-2">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -224,21 +208,39 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* Góc phải: Trạng thái & Đăng nhập / Đăng xuất */}
+          {/* Góc phải: Trạng thái & Đăng nhập / Đăng xuất kèm tích hợp trang cá nhân */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {isAdminLoggedIn ? (
-              <div className="flex items-center space-x-2 bg-slate-800/80 p-1.5 pl-3 rounded-xl border border-slate-700">
-                <div className="flex items-center space-x-2">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white font-bold flex items-center justify-center text-xs">
-                    <UserCheck className="w-3.5 h-3.5" />
+              <div className="flex items-center space-x-2 bg-slate-800/80 p-1.5 pl-2.5 rounded-xl border border-slate-700">
+                {/* Link Avatar dẫn tới /me với icon trạng thái nhỏ gọn */}
+                <Link 
+                  href="/me" 
+                  className="flex items-center space-x-2 hover:opacity-85 transition group" 
+                  title="Xem trang cá nhân"
+                >
+                  <div className="relative">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white font-bold flex items-center justify-center text-xs shadow-inner">
+                      <UserCheck className="w-4 h-4" />
+                    </div>
+                    {/* Icon mini trang cá nhân gắn chèn góc avatar */}
+                    <span className="absolute -bottom-1 -right-1 bg-slate-900 border border-emerald-500 text-emerald-400 rounded-full p-0.5 flex items-center justify-center shadow">
+                      <UserCog className="w-2.5 h-2.5" />
+                    </span>
                   </div>
-                  <div className="text-left hidden sm:block max-w-[140px]">
-                    <p className="text-xs font-bold text-slate-200 leading-tight truncate" title={userName}>
+
+                  <div className="text-left hidden sm:block max-w-[130px]">
+                    <p className="text-xs font-bold text-slate-200 leading-tight truncate group-hover:text-emerald-400 transition" title={userName}>
                       {userName}
                     </p>
-                    <p className="text-[9px] text-emerald-400 font-semibold mt-0.5">Đã đăng nhập</p>
+                    <p className="text-[9px] text-emerald-400 font-semibold mt-0.5 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      Trực tuyến
+                    </p>
                   </div>
-                </div>
+                </Link>
+
+                <div className="h-5 w-[1px] bg-slate-700 mx-0.5"></div>
+
                 <button
                   onClick={handleLogout}
                   className="inline-flex items-center space-x-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 px-2.5 py-1.5 rounded-lg text-xs font-bold transition"
@@ -257,6 +259,7 @@ export default function Navbar() {
                 <span className="hidden min-[360px]:inline">Đăng Nhập</span>
               </button>
             )}
+
             <button
               type="button"
               onClick={() => setShowMobileNav((open) => !open)}
@@ -270,8 +273,9 @@ export default function Navbar() {
 
         </div>
 
+        {/* Menu Mobile */}
         {showMobileNav && (
-          <nav className="md:hidden border-t border-slate-800 bg-slate-900 px-3 py-2">
+          <nav className="md:hidden border-t border-slate-800 bg-slate-900 px-3 py-2 space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -290,6 +294,18 @@ export default function Navbar() {
                 </Link>
               );
             })}
+            {isAdminLoggedIn && (
+              <Link
+                href="/me"
+                onClick={() => setShowMobileNav(false)}
+                className={`flex min-h-11 items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold ${
+                  pathname === '/me' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                <UserCog className="h-4 w-4" />
+                <span>Trang cá nhân</span>
+              </Link>
+            )}
           </nav>
         )}
       </header>
@@ -316,7 +332,6 @@ export default function Navbar() {
             </div>
             
             <div className="space-y-3">
-              {/* Input Tài khoản / Email */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Email đăng nhập</label>
                 <div className="relative">
@@ -333,7 +348,6 @@ export default function Navbar() {
                 </div>
               </div>
 
-              {/* Input Mật khẩu */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Mật khẩu</label>
                 <div className="relative">

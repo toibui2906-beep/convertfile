@@ -101,7 +101,7 @@ export default function Page360Home() {
               </div>
 
               <h2 className="mb-2 text-lg font-semibold text-slate-900">
-                Đợt đánh giá
+                Tổng hợp các đợt đánh giá
               </h2>
               <p className="mb-5 text-sm leading-6 text-slate-600">
                 Tổng hợp kết quả theo các đợt đánh giá, phân tích dữ liệu và xuất báo cáo chi tiết về năng lực của từng nhân sự.

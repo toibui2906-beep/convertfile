@@ -42,21 +42,18 @@ export default function EvaluationsHubPage() {
       try {
         setLoading(true);
         
-        // 1. Kiểm tra xem user có phải Admin hay không
-        const isAdmin = localStorage.getItem('isAdminLoggedIn') === 'true';
-        
-        // 2. Lấy userId của user đang đăng nhập (được lưu vào localStorage khi đăng nhập thành công)
+        // 1. Lấy role và userId từ localStorage
+        const userRole = localStorage.getItem('userRole') || 'STAFF'; // 'ADMIN' hoặc 'STAFF'
         const currentUserId = localStorage.getItem('userId') || ''; 
 
-        let endpoint = `/api/360/surveys/users`;
+        // 2. Xây dựng URL endpoint đúng với logic API mới của backend
+        let endpoint = `/api/360/surveys/users?role=${userRole}`;
         
-        if (isAdmin) {
-          endpoint += `?isAdmin=true`;
-        } else {
+        if (userRole !== 'ADMIN') {
           if (!currentUserId) {
             console.warn('Chưa có thông tin userId trong localStorage. Vui lòng đăng nhập lại.');
           }
-          endpoint += `?userId=${currentUserId}`;
+          endpoint += `&userId=${currentUserId}`;
         }
 
         const res = await fetch(endpoint, {
